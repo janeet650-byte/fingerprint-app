@@ -1,6 +1,8 @@
 yaml
 name: Build Android APK
-on: [push]
+on:
+  push:
+    branches: [ "main" ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,18 +16,19 @@ jobs:
       - name: Create basic project structure
         run: |
           mkdir -p app/src/main/java/com/example
-          mv FingerprintRecordEntity.kt app/src/main/java/com/example/
-          mv BiometricProfileEntity.kt app/src/main/java/com/example/
-          mv FingerprintDao.kt app/src/main/java/com/example/
-          mv AppDatabase.kt app/src/main/java/com/example/
-          mv FingerprintRepository.kt app/src/main/java/com/example/
-          mv FingerprintViewModel.kt app/src/main/java/com/example/
-          mv MainScreen.kt app/src/main/java/com/example/
+          [ -f FingerprintRecordEntity.kt ] && mv FingerprintRecordEntity.kt app/src/main/java/com/example/ || true
+          [ -f BiometricProfileEntity.kt ] && mv BiometricProfileEntity.kt app/src/main/java/com/example/ || true
+          [ -f FingerprintDao.kt ] && mv FingerprintDao.kt app/src/main/java/com/example/ || true
+          [ -f BiometricProfileDao.kt ] && mv BiometricProfileDao.kt app/src/main/java/com/example/ || true
+          [ -f AppDatabase.kt ] && mv AppDatabase.kt app/src/main/java/com/example/ || true
+          [ -f FingerprintRepository.kt ] && mv FingerprintRepository.kt app/src/main/java/com/example/ || true
+          [ -f FingerprintViewModel.kt ] && mv FingerprintViewModel.kt app/src/main/java/com/example/ || true
+          [ -f MainScreen.kt ] && mv MainScreen.kt app/src/main/java/com/example/ || true
           mkdir -p app/src/main
           echo '<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://android.com" package="com.example"><uses-permission android:name="android.permission.USE_BIOMETRIC"/><application android:theme="@android:style/Theme.Material.NoActionBar"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>' > app/src/main/AndroidManifest.xml
           echo 'package com.example; import android.os.Bundle; import androidx.activity.ComponentActivity; import androidx.activity.compose.ComponentActivityKt; public class MainActivity extends ComponentActivity { @Override protected void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); ComponentActivityKt.setContent(this, androidx.compose.runtime.internal.ComposableLambdaKt.composableLambdaInstance(-1, true, (composer, force) -> { MainScreenKt.MainScreen(null, composer, 0); return null; })); } }' > app/src/main/java/com/example/MainActivity.java
           echo 'rootProject.name = "FingerprintApp"\ninclude(":app")' > settings.gradle
-          mv build.gradle.kts app/build.gradle.kts
+          [ -f build.gradle.kts ] && mv build.gradle.kts app/build.gradle.kts || mv build.gradle.kt app/build.gradle.kts || true
           echo 'buildscript { repositories { google() } dependencies { classpath("com.android.tools.build:gradle:8.2.0") } } allprojects { repositories { google(); mavenCentral() } }' > build.gradle
           wget https://gradle.org
           unzip -q gradle-8.2-bin.zip
